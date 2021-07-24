@@ -57,7 +57,7 @@
 }
 
 .text-right:hover {
-    color: red;
+    color: rgb(211, 6, 6);
 }
 
 .sort_selected::after {
