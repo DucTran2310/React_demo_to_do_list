@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import * as actions from '../actions/index';
 
 class TaskForm extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            id: '',
+            name: '',
+            status: false
+        };
     }
 
     componentDidMount() {
@@ -22,7 +28,7 @@ class TaskForm extends Component {
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
-        //console.log(nextProps);
+        // console.log(nextProps);
         if (nextProps && nextProps.itemEditing) {
             this.setState({
                 id: nextProps.itemEditing.id,
@@ -44,26 +50,27 @@ class TaskForm extends Component {
         });
     }
 
-    onHandleSubmit = (event) => {
+    onSave = (event) => {
+        //ngăn chặn cách xử lý mặc định của trình duyệt khi xảy ra sự kiện.
         event.preventDefault();
-        this.props.onSave(this.state);
+        this.props.onSaveTask(this.state);
         this.onClear();
         this.onExitForm();
     }
 
     onClear = () => {
         this.setState({
-            id: '',
             name: '',
             status: false
         });
     }
 
     onExitForm = () => {
-        this.props.onExitForm();
+        this.props.onCloseForm();
     }
 
     render() {
+        if (!this.props.isDisplayForm) return '';
         return (
             <div className="panel panel-warning">
                 <div className="panel-heading">
@@ -76,7 +83,7 @@ class TaskForm extends Component {
                     </h3>
                 </div>
                 <div className="panel-body">
-                    <form onSubmit={this.onHandleSubmit} >
+                    <form onSubmit={this.onSave} >
                         <div className="form-group">
                             <label>Tên :</label>
                             <input
@@ -112,4 +119,22 @@ class TaskForm extends Component {
     }
 }
 
-export default TaskForm;
+const mapStateToProps = state => {
+    return {
+        isDisplayForm: state.isDisplayForm,
+        itemEditing: state.itemEditing
+    }
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+    return {
+        onSaveTask: (task) => {
+            dispatch(actions.saveTask(task));
+        },
+        onCloseForm: () => {
+            dispatch(actions.closeForm());
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TaskForm);
